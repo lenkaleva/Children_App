@@ -90,26 +90,47 @@ def show_lenka_page():
 
     st.set_page_config(page_title="Analýza dětské obezity", layout="wide")
 
+   # ⭐ FUNKCE NA ZVĚTŠENÍ TITULKU GRAFŮ
+    def title24(fig):
+        fig.update_layout(title_font=dict(size=24))
+        return fig
+
     st.markdown("""
     <style>
+
     .stApp { background-color: #f6f8fb; }
     .kpi-wrapper { margin-bottom: 40px; }
+
     .kpi-box {
-        background: #ffffff; padding:16px; border-radius:16px;
-        border:1px solid #d8e2f5; box-shadow:0 2px 6px rgba(0,0,0,0.12);
+        background: #ffffff;
+        padding:16px;
+        border-radius:16px;
+        border:1px solid #d8e2f5;
+        box-shadow:0 2px 6px rgba(0,0,0,0.12);
         text-align:center;
+
+        /* HOVER musí být zde – funguje jen když parent NENÍ overflow:hidden */
+        transition: box-shadow 0.18s ease;
     }
-    div[data-testid="stPlotlyChart"] {
+
+    .kpi-box:hover {
+        box-shadow: 0 6px 18px rgba(15,23,42,0.18);
+    }
+
+    /* 🎯 Nový bezpečný selektor, který nezasáhne KPI */
+    div[data-testid="stVerticalBlock"] div[data-testid="stPlotlyChart"] {
         background-color: #ffffff !important;
         padding: 12px !important;
         border-radius: 16px !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
         margin-bottom: 16px !important;
-        overflow: hidden !important;
+        overflow: hidden !important; /* funguje a neblokuje KPI hover */
         max-width: 100% !important;
     }
+
     </style>
     """, unsafe_allow_html=True)
+
 
     st.title("Cross-Country Analysis of Childhood Obesity")
 
@@ -118,27 +139,31 @@ def show_lenka_page():
     # ------------------------------------------------------------
     if "df" not in st.session_state:
         df = pd.read_csv("data.csv")
-
-        df["COUNTRY_NAME"] = df["COUNTRY_NAME"].replace({
-            "Belgium (Flemish)": "Belgium",
-            "Belgium (French)": "Belgium"
-        })
-
-        uk_map = {
-            "England": "United Kingdom", "Scotland": "United Kingdom",
-            "Wales": "United Kingdom", "Northern Ireland": "United Kingdom",
-            "Great Britain": "United Kingdom",
-            "UK (England)": "United Kingdom",
-            "UK (Wales)": "United Kingdom",
-            "UK (Scotland)": "United Kingdom"
-        }
-        df["COUNTRY_NAME"] = df["COUNTRY_NAME"].replace(uk_map)
-
         st.session_state.df = df
     else:
-        df = st.session_state.df
+        df = st.session_state.df.copy()
 
+    # ---- ALWAYS RUN NORMALIZATION (Belgium + UK) ----
+    df["COUNTRY_NAME"] = df["COUNTRY_NAME"].replace({
+        "Belgium (Flemish)": "Belgium",
+        "Belgium (French)": "Belgium"
+    })
+
+    uk_map = {
+        "England": "United Kingdom",
+        "Scotland": "United Kingdom",
+        "Wales": "United Kingdom",
+        "Northern Ireland": "United Kingdom",
+        "Great Britain": "United Kingdom",
+        "UK (England)": "United Kingdom",
+        "UK (Wales)": "United Kingdom",
+        "UK (Scotland)": "United Kingdom"
+    }
+    df["COUNTRY_NAME"] = df["COUNTRY_NAME"].replace(uk_map)
+
+    # ---- APPLY CORRECTIONS ----
     df.loc[df["BUL_BEEN"] == 999, "BUL_BEEN"] = np.nan
+
 
 
     # ============================================================
@@ -279,7 +304,7 @@ def show_lenka_page():
         fig_line.update_layout(
             height=450,
             autosize=True,
-            margin=dict(l=20, r=20, t=60, b=40),
+            margin=dict(l=20, r=20, t=80, b=40),
             legend=dict(
                 title="Country",
                 orientation="v",
@@ -289,7 +314,7 @@ def show_lenka_page():
             )
         )
 
-        st.plotly_chart(fig_line, width='stretch', config={})
+        st.plotly_chart(title24(fig_line), width='stretch', config={})
 
 
     # ------------------------------------------------------------
@@ -337,6 +362,34 @@ def show_lenka_page():
         title="TOP 5 factors associated with obesity"
     )
 
+    # Legenda – podmíněné umístění
+    if selected_country == "All countries":
+        # původní legenda vpravo
+        fig_top5.update_layout(
+            legend=dict(
+                title="Country",
+                orientation="v",
+                x=1.20,
+                y=1,
+                xanchor="left",
+                yanchor="top"
+            )
+        )
+    else:
+        # legenda nahoře uprostřed
+        fig_top5.update_layout(
+            margin=dict(t=90),
+            legend=dict(
+                title="Country",      # ← stejně i zde
+                orientation="h",
+                x=0.70,
+                y=1.18,
+                xanchor="center",
+                yanchor="bottom"
+            )
+        )
+
+
     # ------------------------------------------------------------
     # GRAF 3 – Overweight podle věku
     # ------------------------------------------------------------
@@ -354,18 +407,45 @@ def show_lenka_page():
         color_discrete_map=color_map,
         title="Overweight by Age"
     )
+    # Legenda – podmíněné umístění (stejně jako u TOP5)
+    if selected_country == "All countries":
+        fig_age.update_layout(
+            legend=dict(
+                title="Country",      # ← vždy stejný název legendy
+                orientation="v",
+                x=1.02,
+                y=1,
+                xanchor="left",
+                yanchor="top"
+            )
+        )
+    else:
+        fig_age.update_layout(
+            margin=dict(t=90),
+            legend=dict(
+                title="Country",      # ← stejně i zde
+                orientation="h",
+                x=0.5,
+                y=1.18,
+                xanchor="center",
+                yanchor="bottom"
+            )
+        )
 
     col_g2, col_g3 = st.columns(2)
+
     with col_g2:
-        st.plotly_chart(fig_top5, width='stretch', config={})
+        st.plotly_chart(title24(fig_top5), width='stretch', config={})
+
     with col_g3:
-        st.plotly_chart(fig_age, width='stretch', config={})
+        st.plotly_chart(title24(fig_age), width='stretch', config={})
+
 
 
     # ------------------------------------------------------------
     # GRAF 4 – TOP X (aliasy doplněny)
     # ------------------------------------------------------------
-    top_n = st.slider("Number of factors:", 5, 20, 15)
+    top_n = st.slider("Number of factors:", 5, 15, 15)   # ← MAX = 15
 
     remaining = corr_vals.index.tolist()[5:]
     topX = remaining[:top_n]
@@ -394,6 +474,34 @@ def show_lenka_page():
         color_discrete_map=color_map,
         title=f"TOP {top_n} additional factors (normalized)"
     )
+
+    # ⭐ ZMĚNA VELIKOSTI NÁZVU
+    fig_topX.update_layout(title_font=dict(size=24))
+
+    # ⭐ STEJNÁ LOGIKA LEGENDY — KOPIE Z PŘEDCHOZÍCH GRAFŮ
+    if selected_country == "All countries":
+        fig_topX.update_layout(
+            legend=dict(
+                title="Country",
+                orientation="v",
+                x=1.20,
+                y=1,
+                xanchor="left",
+                yanchor="top"
+            )
+        )
+    else:
+        fig_topX.update_layout(
+            margin=dict(t=110),
+            legend=dict(
+                title="Country",
+                orientation="h",
+                x=0.70,
+                y=1.18,
+                xanchor="center",
+                yanchor="bottom"
+            )
+        )
 
     st.plotly_chart(fig_topX, width='stretch', config={})
 
@@ -488,13 +596,14 @@ def show_lenka_page():
     col4, col5 = st.columns([1, 1])
 
     with col4:
-        st.plotly_chart(fig_dev, width='stretch', config={})
+        st.plotly_chart(title24(fig_dev), width='stretch', config={})
 
     with col5:
-        st.plotly_chart(fig_dumbbell, width='stretch', config={})
+        st.plotly_chart(title24(fig_dumbbell), width='stretch', config={})
 
 
 # ------------------------------------------------------------
 # RUN
 # ------------------------------------------------------------
 show_lenka_page()
+

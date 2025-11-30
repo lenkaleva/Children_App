@@ -112,7 +112,7 @@ st.title("Gender Differences in Childhood Overweight")
 # LOADING DATA
 # ------------------------------------------------------------
 if 'df' not in st.session_state:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('/data/in/tables/T08_OVERWEIGHT_CLEANED.csv')
     df["COUNTRY_NAME"] = df["COUNTRY_NAME"].replace({
         "Belgium (Flemish)": "Belgium",
         "Belgium (French)": "Belgium"

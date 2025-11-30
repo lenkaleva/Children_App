@@ -3,7 +3,7 @@ import pandas as pd
 
 # Načtení dat
 if 'df' not in st.session_state:
-    st.session_state.df = pd.read_csv('data.csv')
+    st.session_state.df = pd.read_csv('/data/in/tables/T08_OVERWEIGHT_CLEANED.csv')
 
 df = st.session_state.df
 

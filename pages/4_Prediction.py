@@ -3,9 +3,9 @@ import pandas as pd
 import joblib
 from PIL import Image
 
-st.set_page_config(page_title="Predikce obezity", page_icon="🧒")
+st.set_page_config(page_title="Predikce nadváhy", page_icon="🧒")
 
-st.title("🧒 Predikce dětské obezity")
+st.title("🧒 Predikce dětské nadváhy")
 st.write("")
 
 # ---------------------------
@@ -112,6 +112,6 @@ if st.button("🔍 Spočítat predikci"):
     st.subheader("📊 Výsledek")
 
     if cls == 1:
-        st.error(f"**Vaše dítě má zvýšené riziko obezity.**\nPravděpodobnost: **{proba:.1%}**")
+        st.error(f"**Vaše dítě má zvýšené riziko nadváhy.**\nPravděpodobnost: **{proba:.1%}**")
     else:
-        st.success(f"**Nízké riziko obezity.**\nPravděpodobnost: **{proba:.1%}**")
+        st.success(f"**Nízké riziko nadváhy.**\nPravděpodobnost: **{proba:.1%}**")

@@ -344,7 +344,7 @@ if st.button("🔍 Evaluate"):
     st.subheader("📊 Recommendation")
 
     # vezme API key z proměnné prostředí (později si ho tam nastavíš)
-    API_KEY = os.getenv("OPENAI_API_KEY")
+    API_KEY = ""
 
     if not API_KEY:
         st.info("AI recommendation is not available because the API key is not configured.")

@@ -48,14 +48,6 @@ st.markdown("""
 
 
 
-
-
-
-
-
-
-
-
 st.markdown("""
 <style>
 
@@ -352,7 +344,7 @@ if st.button("🔍 Evaluate"):
     st.subheader("📊 Recommendation")
 
     # vezme API key z proměnné prostředí (později si ho tam nastavíš)
-    API_KEY = os.getenv("OPENAI_API_KEY")
+    API_KEY = "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"
 
     if not API_KEY:
         st.info("AI recommendation is not available because the API key is not configured.")

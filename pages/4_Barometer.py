@@ -1,6 +1,8 @@
 import streamlit as st
 from openai import OpenAI
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 st.title("🧒 Child Overweight Barometer")
@@ -344,7 +346,7 @@ if st.button("🔍 Evaluate"):
     st.subheader("📊 Recommendation")
 
     # vezme API key z proměnné prostředí (později si ho tam nastavíš)
-    API_KEY = ""
+    API_KEY = os.getenv("OPENAI_API_KEY")
 
     if not API_KEY:
         st.info("AI recommendation is not available because the API key is not configured.")

@@ -16,16 +16,14 @@ st.markdown("""
     /* Každý selectbox blok – stejné rozestupy mezi otázkami */
     div[data-testid="stSelectbox"] {
         margin-top: 0 !important;
-        margin-bottom: 18px !important;   /* tady si můžeš doladit rozestup */
+        margin-bottom: 18px !important;   /* tady doladíš vertikální rozestup */
     }
 
-    /* Vzhled selectboxu */
+    /* Vzhled selectboxu – BEZ centrování, BEZ max-width */
     div[data-baseweb="select"] {
         border-radius: 8px !important;
         background-color: #f8f9fb !important;
         border: 1px solid #e2e6ec !important;
-        max-width: 600px;
-        margin: 0 auto;
     }
 
     /* Text uvnitř selectboxu */

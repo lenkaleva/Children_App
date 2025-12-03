@@ -30,7 +30,7 @@ df = st.session_state.df
 st.title("Childhood Overweight: Country, Behaviour & Lifestyle Factors")
 st.subheader("Data Analysis Based on the International HBSC Study (2002–2018)")
 
-image_path = Path("C:\Users\aneta\OneDrive\Desktop\Streamlit_App_Repo\Children_App\pic.png")
+image_path = Path("pic.png")
 if image_path.is_file():
     st.image(str(image_path), use_container_width=True)
 

@@ -1,98 +1,58 @@
 import streamlit as st
 from openai import OpenAI
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
-
-st.title("🧒 Child Overweight Barometer")
-
+st.title("📊 Child Weight Risk Barometer")
 st.markdown("""
 <style>
+    /* Zúžení hlavního obsahu a centrování */
+    .main > div {
+        max-width: 750px;
+        margin: 0 auto;
+        padding-top: 2rem;
+    }
 
-    /* A+ PREMIUM FORM STYLE — Notion / iOS inspired */
-
-    /* --- LABELS (QUESTIONS) --- */
+    /* LABELS (QUESTIONS) – text nad selectboxem */
     div[data-testid="stSelectbox"] label p {
-        font-size: 16px !important;        /* o trochu větší */
-        font-weight: 500 !important;       /* semi-bold, ale ne tučné */
-        color: #555 !important;            /* jemná, prémiová šedá */
-        margin-bottom: 6px !important;     /* pěkný odstup od selectboxu */
-        letter-spacing: 0.2px;             /* jemné zpřesnění typografie */
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #555 !important;
+        margin-bottom: 6px !important;
+        letter-spacing: 0.2px;
     }
 
-    /* --- ANSWER TEXT --- */
-    div[data-baseweb="select"] div {
-        font-size: 15.5px !important; 
-        color: #222 !important;
-    }
-
-    /* --- SELECTBOX CONTAINER --- */
+    /* SELECTBOX CONTAINER – mezera mezi otázkami */
     div[data-testid="stSelectbox"] {
-        margin-bottom: 14px;               /* konzistentní mezery mezi otázkami */
+        margin-bottom: 14px;
     }
 
-    /* --- SELECTBOX APPEARANCE --- */
+    /* SELECTBOX APPEARANCE – border, background, šířka */
     div[data-baseweb="select"] {
-        border-radius: 8px !important;     /* jemné zaoblení */
-        background-color: #f8f9fb !important;  /* elegantní světlá šedá */
-        border: 1px solid #e2e6ec !important;  /* čistá, tenká hranice */
+        border-radius: 8px !important;
+        background-color: #f8f9fb !important;
+        border: 1px solid #e2e6ec !important;
+        max-width: 600px;
+        margin: 0 auto;               /* vycentrování v užším sloupci */
     }
 
-    /* --- HOVER EFFECT (iOS-like) --- */
+    /* TEXT UVNITŘ SELECTBOXU – bez „tab“ odsazení */
+    div[data-baseweb="select"] div {
+        font-size: 15px !important;
+        color: #222 !important;
+        padding-left: 0.2rem !important;  /* minimální, aby text nelepí na hranu */
+    }
+
+    /* HOVER EFFECT (jemné zvýraznění) */
     div[data-baseweb="select"]:hover {
-        border-color: #c5ccd6 !important;  /* jemné zvýraznění při hoveru */
+        border-color: #c5ccd6 !important;
         background-color: #f5f6f8 !important;
     }
-
 </style>
 """, unsafe_allow_html=True)
 
 
-
-st.markdown("""
-<style>
-
- /* QUESTIONS (label text) */
- .question-label {
-     font-size: 18px !important;
-     font-weight: 600 !important;
-     color: #333 !important;
-     margin-bottom: 6px !important;
-     display: block !important;
- }
-
- /* ANSWERS (selectboxes) */
- div[data-baseweb="select"] div {
-    font-size: 15px !important;
- }
-
- /* Question label style */
- .question-label {
-     font-size: 18px !important;
-     font-weight: 600 !important;
-     color: #333 !important;
-     margin-bottom: 2px !important;  /* MEZI OTAZKOU A SELECTEM = MALINKÁ */
-     display: block !important;
- }
-
- /* Reduce extra empty space around selectboxes */
- .stSelectbox {
-     margin-top: -10px !important;   /* stáhne select box nahoru */
- }
-
- /* Answers (selectbox text) */
- div[data-baseweb="select"] div {
-    font-size: 15px !important;
- }
-
-</style>
-""", unsafe_allow_html=True)
-
-
-
-# 1) USER OPTIONS
-
+# -----------------------------
+# 2) USER OPTIONS
+# -----------------------------
 
 sex_options = {"Boy": 1, "Girl": 2}
 
@@ -177,25 +137,18 @@ talkfather_labels = [
     "7 – not in contact"
 ]
 
-# Features we evaluate in the barometer
-controlled_features = [
-    "SOFT_DRINKS", "SWEETS", "VEGETABLES",
-    "FRIEND_TALK", "PHYS_ACT_60", "BREAKFAST_WEEKDAYS",
-    "TOOTH_BRUSHING", "FEEL_LOW", "TALK_FATHER"
-]
 
-
-
-# 2) BUILD VECTOR
-
+# -----------------------------
+# 3) BUILD VECTOR
+# -----------------------------
 # Convert label "1 – daily" → 1
-def extract_number(label):
+def extract_number(label: str) -> int:
     return int(label.split("–")[0].split("-")[0].strip())
 
 
 # 3) BAROMETER SCORE CALCULATED
 
-def compute_risk_score(user_data):
+def compute_risk_score(user_data: dict) -> int:
     """
     Returns lifestyle risk score 0–100.
     0 = very healthy habits, 100 = very unhealthy habits.
@@ -232,10 +185,10 @@ def compute_risk_score(user_data):
     return score_0_100
 
 
+# -----------------------------
 # 4) UI
+# -----------------------------
 
-# --- UI Form (single column layout) ---
-# basic info
 sex_label = st.selectbox("👦👧 What is your child's gender?", list(sex_options.keys()))
 sex = sex_options[sex_label]
 
@@ -286,9 +239,8 @@ talk_father = st.selectbox(
     talkfather_labels
 )
 
-
 # -----------------------------
-# 5) COMPUTE – BAROMETER ONLY
+# 5) COMPUTE - BAROMETER ONLY
 # -----------------------------
 if st.button("🔍 Evaluate"):
     user_data = {
@@ -338,15 +290,13 @@ if st.button("🔍 Evaluate"):
 
     st.markdown(bar_html, unsafe_allow_html=True)
 
+
 # AI DOPORUCENI
-    # -----------------------------
-    # AI DOPORUČENÍ
-    # -----------------------------
+
     st.write("---")
     st.subheader("📊 Recommendation")
 
-    # vezme API key z proměnné prostředí (později si ho tam nastavíš)
-    API_KEY = os.getenv("OPENAI_API_KEY")
+    API_KEY = st.secrets.get("OPENAI_API_KEY")
 
     if not API_KEY:
         st.info("AI recommendation is not available because the API key is not configured.")
@@ -376,7 +326,6 @@ Never give exact probabilities or medical diagnoses.
 Do not ask what you can do next. Give only one time recommendations, that's it.
 """
 
-        # slovní popis míry rizika pro AI
         if score < 30:
             risk_level = "low"
         elif score < 60:
@@ -384,7 +333,6 @@ Do not ask what you can do next. Give only one time recommendations, that's it.
         else:
             risk_level = "high"
 
-        # souhrn profilu dítěte z reálných odpovědí
         user_summary = f"""
 Child profile:
 - Sex: {sex_label}
@@ -407,18 +355,17 @@ Habits:
 
         try:
             response = client.responses.create(
-                model="gpt-5-nano",  # nebo jiný model, který používáš
+                model="gpt-5-nano",  
                 input=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": user_summary},
                 ],
             )
 
-            # pokusíme se vytáhnout text – může se lišit podle verze SDK
+            
             try:
                 recommendation_text = response.output[0].content[0].text
             except Exception:
-                # fallback – pokud knihovna má helper output_text
                 recommendation_text = getattr(response, "output_text", "I could not parse the response text.")
 
             st.write(recommendation_text)

@@ -132,7 +132,7 @@ def show_lenka_page():
     """, unsafe_allow_html=True)
 
 
-    st.title("Cross-Country Analysis of Childhood Obesity")
+    st.title("Cross-Country Analysis of Childhood Overweight")
 
     # ------------------------------------------------------------
     # LOAD DATA
@@ -210,7 +210,7 @@ def show_lenka_page():
             <div class="kpi-label">
                 <img src="https://flagcdn.com/w20/cz.png"
                     style="height:18px; vertical-align:middle; margin-right:6px;">
-                Obesity in Czechia
+                Overweight in Czechia
             </div>
             <div class="kpi-value">{val}</div>
         </div>
@@ -299,7 +299,7 @@ def show_lenka_page():
             df_line, x="YEAR", y="OVERWEIGHT",
             color="COUNTRY_NAME", markers=True,
             color_discrete_map=color_map,
-            title="Trend of Childhood Overweight (2002–2018)"
+            title="Trend of Childhood Overweight (2002-2018)"
         )
         fig_line.update_layout(
             height=450,
@@ -359,7 +359,7 @@ def show_lenka_page():
         color="COUNTRY_NAME",
         barmode="group",
         color_discrete_map=color_map,
-        title="TOP 5 factors associated with obesity"
+        title="TOP 5 Factors Associated with Overweight"
     )
 
     # Legenda – podmíněné umístění
@@ -472,7 +472,7 @@ def show_lenka_page():
         color="COUNTRY_NAME",
         barmode="group",
         color_discrete_map=color_map,
-        title=f"TOP {top_n} additional factors (normalized)"
+        title=f"TOP {top_n} Additional Factors (normalized)"
     )
 
     # ⭐ ZMĚNA VELIKOSTI NÁZVU

@@ -139,11 +139,11 @@ DETAIL_YEAR = 2018
 # ------------------------------------------------------------
 # KPI BLOCK
 # ------------------------------------------------------------
-kpi1_label = "📈 Global change (2002–2018)"
-kpi2_label = f"♀️ Overweight ({DETAIL_YEAR})"
-kpi3_label = f"♂️ Overweight ({DETAIL_YEAR})"
-kpi4_label = "🧒 Highest-risk age (2018)"
-kpi5_label = "🚨 Highest overweight country (2018)"
+kpi1_label = "📈 Global Change (2002–2018)"
+kpi2_label = f"♀️ Girls Overweight ({DETAIL_YEAR})"
+kpi3_label = f"♂️ Boys Overweight ({DETAIL_YEAR})"
+kpi4_label = "🧒 Highest-Risk Age (2018)"
+kpi5_label = "🚨 Highest Overweight Country (2018)"
 
 if df.empty:
     st.warning("No data for selected filters.")
@@ -432,10 +432,10 @@ if not df_filtered.empty:
 
     fig1.update_layout(
         xaxis_title="Year",
-        yaxis_title="Overweight prevalence (0–1)",
+        yaxis_title="Overweight prevalence (0-1)",
         legend_title="Gender",
         title=dict(
-            text="Overweight Trend by Gender (2002–2018)",
+            text="Trend in Childhood Overweight by Gender (2002-2018)",
             font=dict(size=24),
             x=0.0,
             xanchor="left",
@@ -513,7 +513,7 @@ if not df_norm_detail.empty:
                 barmode="group",
                 category_orders={"FACTOR_LABEL": order_help},
                 color_discrete_map={"Boys": "#3b8ee1", "Girls": "#eb8fbd"},
-                title=f"Top 5 behaviours linked to overweight – Boys vs Girls ({DETAIL_YEAR})"
+                title=f"Top 5 Behaviours Linked to Overweight – Boys vs Girls ({DETAIL_YEAR})"
             )
 
             fig2.update_layout(
@@ -680,12 +680,12 @@ if not df_norm_detail.empty:
         df_diff["SIDE"] = np.where(
             df_diff["DIFFERENCE"] > 0,
             "Overweight",
-            "Non-overweight"
+            "Non-Overweight"
         )
 
         color_ow = {
             "Overweight": "orangered",
-            "Non-overweight": "seagreen"
+            "Non-Overweight": "seagreen"
         }
 
         fig5 = px.bar(
@@ -696,7 +696,7 @@ if not df_norm_detail.empty:
             color="SIDE",
             color_discrete_map=color_ow,
             category_orders={"FACTOR_LABEL": df_diff["FACTOR_LABEL"].tolist()},
-            title=f"Overweight vs Non-overweight Differences ({DETAIL_YEAR})",
+            title=f"Overweight vs Non-Overweight Differences ({DETAIL_YEAR})",
         )
 
         fig5.update_layout(
@@ -716,7 +716,7 @@ if not df_norm_detail.empty:
             margin=dict(l=200, r=40, t=60, b=60),
             yaxis=dict(automargin=True),
             title=dict(
-                text=f"Overweight vs Non-overweight Differences ({DETAIL_YEAR})",
+                text=f"Overweight vs Non-Overweight Differences ({DETAIL_YEAR})",
                 font=dict(size=24)
             )
         )
@@ -767,7 +767,7 @@ if not df_map.empty:
         color="GAP_PP",
         color_continuous_scale=gender_gap_colors,
         range_color=(-max_range, max_range),
-        title=f"Where are girls vs boys more overweight? (2018, age {age_min}–{age_max})",
+        title=f"Where Are Girls vs Boys More Overweight? (2018, age {age_min}–{age_max})",
         hover_name="COUNTRY_NAME",
         hover_data={
             "GAP_PP": ":.1f",
@@ -867,7 +867,3 @@ if 'fig6' in locals() and fig6 is not None:
     st.plotly_chart(fig6, width='stretch', key="fig6")
 else:
     st.info("Graph 6 not available for current filters.")
-
-
-
-

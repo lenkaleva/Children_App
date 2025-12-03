@@ -301,6 +301,7 @@ Your task:
 - While giving recommendations, focus ONLY on lifestyle and habits, NOT on diagnosing obesity or giving medical treatment.
 - Give 2-3 concrete, practical tips the parents can start with in everyday life 
   (meals, drinks, movement, routines, screen time, sleep, family habits).
+- Be very brief, max 5-7 setences. Be structured, I want the user to see the structure of your advice. Tips to be clear, maybe some bulb emoji or so.
 
 Background information from the study:
 - Boys had roughly 1.6-1.7 times higher rates of overweight than girls.
@@ -342,24 +343,28 @@ Habits:
 
         client = OpenAI(api_key=API_KEY)
 
+        # placeholder pro „načítám…“ zprávu
+        status_placeholder = st.empty()
+        status_placeholder.markdown("⏳ *Generating tips for your child…*")
+
         try:
-            response = client.responses.create(
-                model="gpt-5-nano",  
-                input=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_summary},
-                ],
-            )
+            # 🔹 spinner během volání modelu
+            with st.spinner("Thinking about your child's lifestyle profile..."):
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_summary},
+                    ],
+                )
 
-            
-            try:
-                recommendation_text = response.output[0].content[0].text
-            except Exception:
-                recommendation_text = getattr(response, "output_text", "I could not parse the response text.")
+            # schovej „načítám…“ zprávu
+            status_placeholder.empty()
 
+            recommendation_text = response.choices[0].message.content
             st.write(recommendation_text)
 
         except Exception as e:
+            status_placeholder.empty()
             st.error("Sorry, there was an error while generating the recommendation.")
             st.text(str(e))
-

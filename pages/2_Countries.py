@@ -138,7 +138,7 @@ def show_lenka_page():
     # LOAD DATA
     # ------------------------------------------------------------
     if "df" not in st.session_state:
-        df = pd.read_csv("/data/in/tables/T08_OVERWEIGHT_CLEANED.csv")
+        df = pd.read_csv("data/in/tables/T08_OVERWEIGHT_CLEANED.csv")
         st.session_state.df = df
     else:
         df = st.session_state.df.copy()

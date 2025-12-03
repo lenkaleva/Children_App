@@ -31,8 +31,6 @@ df = st.session_state.df
 st.title("Childhood Overweight: Country, Behaviour & Lifestyle Factors")
 st.subheader("Data Analysis Based on the International HBSC Study (2002–2018)")
 
-st.image("pic.png", use_container_width=True) 
-
 
 st.markdown("### 🧭 Project Overview")
 st.markdown(

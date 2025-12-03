@@ -3,6 +3,7 @@ from openai import OpenAI
 
 
 st.title("📊 Child Weight Risk Barometer")
+
 st.markdown("""
 <style>
     /* Zúží hlavní obsah a zarovná na střed */
@@ -12,22 +13,13 @@ st.markdown("""
         padding-top: 2rem;
     }
 
-    /* Otázky (label text nad selectboxem) */
-    div[data-testid="stSelectbox"] label p {
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        color: #555 !important;
-        margin-bottom: 4px !important;   /* mezera mezi otázkou a selectem */
-        letter-spacing: 0.2px;
-    }
-
-    /* Každý selectbox blok – konzistentní mezery mezi otázkami */
+    /* Každý selectbox blok – stejné rozestupy mezi otázkami */
     div[data-testid="stSelectbox"] {
         margin-top: 0 !important;
-        margin-bottom: 18px !important;  /* stejné rozestupy mezi otázkami */
+        margin-bottom: 18px !important;   /* tady si můžeš doladit rozestup */
     }
 
-    /* Vzhled selectboxu – rámeček a background */
+    /* Vzhled selectboxu */
     div[data-baseweb="select"] {
         border-radius: 8px !important;
         background-color: #f8f9fb !important;
@@ -36,22 +28,13 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Text uvnitř selectboxu – bez odsazení doleva */
+    /* Text uvnitř selectboxu */
     div[data-baseweb="select"] div {
         font-size: 15px !important;
         color: #222 !important;
-        padding-left: 0 !important;
-    }
-
-    div[data-baseweb="select"] [role="option"],
-    div[data-baseweb="select"] [role="listbox"],
-    div[data-baseweb="select"] [role="button"] {
-        padding-left: 0 !important;
-        margin-left: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
-
 
 
 # -----------------------------

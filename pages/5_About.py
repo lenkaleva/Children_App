@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title("👥 About the Authors")
+st.title("👥 Project Information & Credits")
 
 # ---- CUSTOM CARD STYLE ----
 st.markdown("""

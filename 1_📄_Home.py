@@ -17,6 +17,13 @@ st.markdown("""
 [data-testid="stSidebar"] {
     background-color: #f5f7fb;
 }
+            
+/* Keep homepage content centered, restricted width */
+.main > div {
+    max-width: 800px;      /* úzké, čisté, profesionální */
+    margin: 0 auto;
+    padding-top: 1rem;
+}
 </style>
 """, unsafe_allow_html=True)
 

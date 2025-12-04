@@ -43,7 +43,7 @@ st.markdown("""
 <div class="card">
     <div class="card-title">🟣 Aneta Kantorová</div>
     <div class="links">
-        <a class="linkedin" href="https://www.linkedin.com/in/aneta-kantorova/" target="_blank">🔗 LinkedIn</a>
+        <a class="linkedin" href="https://www.linkedin.com/in/aneta-kantorova-0b8009148/" target="_blank">🔗 LinkedIn</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -53,7 +53,7 @@ st.markdown("""
 <div class="card">
     <div class="card-title">🟣 Lenka Levá</div>
     <div class="links">
-        <a class="linkedin" href="https://www.linkedin.com/in/aneta-kantorova/" target="_blank">🔗 LinkedIn</a>
+        <a class="linkedin" href="https://www.linkedin.com/in/lenkaleva/" target="_blank">🔗 LinkedIn</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -73,7 +73,7 @@ st.markdown("""
 <div class="card">
     <div class="card-title">💻 Project Source Code</div>
     <div class="links">
-        <a class="github" href="https://github.com/lenkaleva/Children_App" target="_blank">🐙 GitHub Repository</a>
+        <a class="github" href="https://github.com/lenkaleva/Children_DA_Project" target="_blank">🐙 GitHub Repository</a>
     </div>
 </div>
 """, unsafe_allow_html=True)

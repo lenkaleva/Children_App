@@ -1,36 +1,36 @@
 import streamlit as st
 from openai import OpenAI
 
-
+# ================================
+#  TITULEK
+# ================================
 st.title("📊 Child Weight Risk Barometer")
 
+# ================================
+#  STYL
+# ================================
 st.markdown("""
 <style>
-    /* Zúží hlavní obsah a zarovná na střed */
     .main > div {
-        max-width: 750px;
+        max-width: 900px;
         margin: 0 auto;
         padding-top: 2rem;
     }
 
-    /* Každý selectbox blok – stejné rozestupy mezi otázkami */
+    /* rozumné mezery mezi otázkami */
     div[data-testid="stSelectbox"] {
         margin-top: 0 !important;
-        margin-bottom: 18px !important;
+        margin-bottom: 12px !important;
     }
 
-    /* Vzhled a ŠÍŘKA selectboxu */
     div[data-baseweb="select"] {
         border-radius: 8px !important;
         background-color: #f8f9fb !important;
         border: 1px solid #e2e6ec !important;
-
-        max-width: 480px;     /* 👈 tady zúžíme pole */
-        width: 100%;          /* aby se hezky přizpůsobilo v rámci těch 480 px */
-        margin: 0;            /* žádné centrování */
+        width: 100% !important;
+        margin: 0;
     }
 
-    /* Text uvnitř selectboxu */
     div[data-baseweb="select"] div {
         font-size: 15px !important;
         color: #222 !important;
@@ -39,9 +39,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# -----------------------------
-# 2) USER OPTIONS
-# -----------------------------
+# ================================
+# 2) USER OPTIONS – ŠKÁLY
+# ================================
 
 sex_options = {"Boy": 1, "Girl": 2}
 
@@ -66,16 +66,6 @@ vegetables_labels = [
     "5 – less than once per week",
     "6 – rarely",
     "7 – never"
-]
-
-friend_talk_labels = [
-    "1 – very easy",
-    "2",
-    "3",
-    "4 – neutral",
-    "5",
-    "6",
-    "7 – very difficult"
 ]
 
 phys_labels = [
@@ -127,16 +117,17 @@ talkfather_labels = [
 ]
 
 
-# -----------------------------
-# 3) BUILD VECTOR
-# -----------------------------
-# Convert label "1 – daily" → 1
+# ================================
+# 3) BUILD VECTOR – pomocná funkce
+# ================================
 def extract_number(label: str) -> int:
+    """Convert label like '1 – daily' → 1"""
     return int(label.split("–")[0].split("-")[0].strip())
 
 
-# 3) BAROMETER SCORE CALCULATED
-
+# ================================
+# 3b) BAROMETER SCORE – VÝPOČET
+# ================================
 def compute_risk_score(user_data: dict) -> int:
     """
     Returns lifestyle risk score 0–100.
@@ -147,7 +138,6 @@ def compute_risk_score(user_data: dict) -> int:
     soft_drinks_risk = (user_data["SOFT_DRINKS"] - 1) / 6
     sweets_risk      = (user_data["SWEETS"] - 1) / 6
     vegetables_risk  = (user_data["VEGETABLES"] - 1) / 6
-    friend_talk_risk = (user_data["FRIEND_TALK"] - 1) / 6
     phys_risk        = (user_data["PHYS_ACT_60"] - 1) / 6
     breakfast_risk   = (user_data["BREAKFAST_WEEKDAYS"] - 1) / 6
     feel_low_risk    = (user_data["FEEL_LOW"] - 1) / 6
@@ -160,7 +150,6 @@ def compute_risk_score(user_data: dict) -> int:
         soft_drinks_risk,
         sweets_risk,
         vegetables_risk,
-        friend_talk_risk,
         phys_risk,
         breakfast_risk,
         teeth_risk,
@@ -174,63 +163,76 @@ def compute_risk_score(user_data: dict) -> int:
     return score_0_100
 
 
-# -----------------------------
-# 4) UI
-# -----------------------------
+# ================================
+# 4) UI – OTÁZKY VE DVOU SLOUPCÍCH
+# ================================
 
-sex_label = st.selectbox("👦👧 What is your child's gender?", list(sex_options.keys()))
-sex = sex_options[sex_label]
+# řádek 0 – gender / age
+row0_col1, row0_col2 = st.columns(2)
+with row0_col1:
+    sex_label = st.selectbox("👦👧 Gender of your child", list(sex_options.keys()))
+    sex = sex_options[sex_label]
+with row0_col2:
+    age = st.selectbox("🎂 Age of your child", list(range(10, 17)))
 
-age = st.selectbox("🎂 How old is your child?", list(range(10, 17)))
+st.markdown("---")
 
-soft_drinks = st.selectbox(
-    "🥤 How many times a week does your child drink soft drinks?",
-    soft_drinks_labels
-)
+# řádek 1 – soft drinks / sweets
+row1_col1, row1_col2 = st.columns(2)
+with row1_col1:
+    soft_drinks = st.selectbox(
+        "🥤 How many times a week does your child drink soft drinks?",
+        soft_drinks_labels
+    )
+with row1_col2:
+    sweets = st.selectbox(
+        "🍬 How many times a week does your child eat sweets?",
+        sweets_labels
+    )
 
-sweets = st.selectbox(
-    "🍬 How many times a week does your child eat sweets?",
-    sweets_labels
-)
+# řádek 2 – vegetables / physical activity
+row2_col1, row2_col2 = st.columns(2)
+with row2_col1:
+    vegetables = st.selectbox(
+        "🥦 How many times a week does your child eat vegetables?",
+        vegetables_labels
+    )
+with row2_col2:
+    phys = st.selectbox(
+        "🏃‍♂️ On how many days per week is your child physically active for at least 60 minutes?",
+        phys_labels
+    )
 
-vegetables = st.selectbox(
-    "🥦 How many times a week does your child eat vegetables?",
-    vegetables_labels
-)
+# řádek 3 – feeling low / teeth
+row3_col1, row3_col2 = st.columns(2)
+with row3_col1:
+    feel_low = st.selectbox(
+        "😔 How often does your child feel low or sad?",
+        feellow_labels
+    )
+with row3_col2:
+    teeth = st.selectbox(
+        "🦷 How often does your child brush their teeth?",
+        tooth_labels
+    )
 
-friend_talk = st.selectbox(
-    "🗣️ Your child can talk with friends about their problems.",
-    friend_talk_labels
-)
+# řádek 4 – breakfast / talk to father
+row4_col1, row4_col2 = st.columns(2)
+with row4_col1:
+    breakfast = st.selectbox(
+        "🍽️ On how many schooldays does your child usually eat breakfast?",
+        breakfast_labels
+    )
+with row4_col2:
+    talk_father = st.selectbox(
+        "👨‍👧 How easy is it for your child to talk to their father about their problems?",
+        talkfather_labels
+    )
 
-feel_low = st.selectbox(
-    "😔 How often does your child feel low or sad?",
-    feellow_labels
-)
 
-phys = st.selectbox(
-    "🏃‍♂️ On how many days per week is your child physically active for at least 60 minutes?",
-    phys_labels
-)
-
-breakfast = st.selectbox(
-    "🍽️ On how many schooldays does your child usually eat breakfast?",
-    breakfast_labels
-)
-
-teeth = st.selectbox(
-    "🦷 How often does your child brush their teeth?",
-    tooth_labels
-)
-
-talk_father = st.selectbox(
-    "👨‍👧 How easy is it for your child to talk to their father about their problems?",
-    talkfather_labels
-)
-
-# -----------------------------
-# 5) COMPUTE - BAROMETER ONLY
-# -----------------------------
+# ================================
+# 5) COMPUTE – BAROMETER + AI TIP
+# ================================
 if st.button("🔍 Evaluate"):
     user_data = {
         "SEX": sex,
@@ -238,133 +240,8 @@ if st.button("🔍 Evaluate"):
         "SOFT_DRINKS": extract_number(soft_drinks),
         "SWEETS": extract_number(sweets),
         "VEGETABLES": extract_number(vegetables),
-        "FRIEND_TALK": extract_number(friend_talk),
         "PHYS_ACT_60": extract_number(phys),
         "BREAKFAST_WEEKDAYS": extract_number(breakfast),
         "TOOTH_BRUSHING": extract_number(teeth),
-        "FEEL_LOW": extract_number(feel_low),
-        "TALK_FATHER": extract_number(talk_father)
+        "FEEL_LOW":_
     }
-
-    score = compute_risk_score(user_data)   # 0–100
-    risk_ratio = score / 100               # 0–1
-    arrow_pct = 2 + 96 * risk_ratio 
-
-    st.write("### Behaviour Risk Meter")
-
-    bar_html = f"""
-    <div style="
-        width: 100%;
-        height: 35px;
-        background: linear-gradient(to right, 
-            #4caf50 0%,
-            #ffeb3b 50%,
-            #f44336 100%
-        );
-        border-radius: 8px;
-        position: relative;
-    ">
-        <div style="
-            position: absolute;
-            left: calc({arrow_pct}% - 10px);
-            top: -8px;
-            font-size: 26px;
-        ">⬆</div>
-    </div>
-
-    <p style="text-align:center; font-size:14px; margin-top:4px;">
-        Lifestyle risk score: <b>{score}</b> / 100
-    </p>
-    """
-
-    st.markdown(bar_html, unsafe_allow_html=True)
-
-    
-# AI DOPORUCENI
-
-    st.write("---")
-    st.subheader("📊 Recommendation")
-
-    API_KEY = st.secrets.get("OPENAI_API_KEY")
-
-    if not API_KEY:
-        st.info("AI recommendation is not available because the API key is not configured.")
-    else:
-        SYSTEM_PROMPT = """
-You are a very supportive health coach for parents, focused to prevent obesity and/or overweight, that's your primary goal. 
-You receive a short profile of a child, including sex, age, a lifestyle risk score (0-100)
-and a description of daily habits (diet, physical activity, emotional state, hygiene).
-
-Your task:
-- Pick up on answers which are most disturbing but also pick up on those most positive and give the parents a cheer up for good work.
-- Explain in simple, encouraging language what the main concerns are.
-- While giving recommendations, focus ONLY on lifestyle and habits, NOT on diagnosing obesity or giving medical treatment.
-- Give 2-3 concrete, practical tips the parents can start with in everyday life 
-  (meals, drinks, movement, routines, screen time, sleep, family habits).
-- Be very brief, max 5-7 setences. Be structured, I want the user to see the structure of your advice. Tips to be clear, maybe some bulb emoji or so.
-
-Background information from the study:
-- Boys had roughly 1.6-1.7 times higher rates of overweight than girls.
-- Younger children around 11 years had somewhat higher risk than older teenagers.
-
-Therefore:
-- Be slightly more cautious and proactive in your advice for younger boys with high risk scores.
-- For girls and older teens, still give clear advice, but avoid exaggerating the risk.
-
-Always stay kind, non-judgmental and supportive.
-Never give exact probabilities or medical diagnoses.
-Do not ask what you can do next. Give only one time recommendations, that's it.
-"""
-
-        if score < 30:
-            risk_level = "low"
-        elif score < 60:
-            risk_level = "medium"
-        else:
-            risk_level = "high"
-
-        user_summary = f"""
-Child profile:
-- Sex: {sex_label}
-- Age: {age}
-- Lifestyle risk score: {score}/100 ({risk_level} risk)
-
-Habits:
-- Soft drinks: {soft_drinks_labels[user_data['SOFT_DRINKS'] - 1]}
-- Sweets: {sweets_labels[user_data['SWEETS'] - 1]}
-- Vegetables: {vegetables_labels[user_data['VEGETABLES'] - 1]}
-- Physical activity (60+ min): {phys_labels[user_data['PHYS_ACT_60'] - 1]}
-- Breakfast on schooldays: {breakfast_labels[user_data['BREAKFAST_WEEKDAYS'] - 1]}
-- Tooth brushing: {tooth_labels[user_data['TOOTH_BRUSHING'] - 1]}
-- Feeling low: {feellow_labels[user_data['FEEL_LOW'] - 1]}
-- Talking with friends: {friend_talk_labels[user_data['FRIEND_TALK'] - 1]}
-- Talking to father: {talkfather_labels[user_data['TALK_FATHER'] - 1]}
-"""
-
-        client = OpenAI(api_key=API_KEY)
-
-        # placeholder pro „načítám…“ zprávu
-        status_placeholder = st.empty()
-        status_placeholder.markdown("⏳ *Generating tips for your child…*")
-
-        try:
-            # 🔹 spinner během volání modelu
-            with st.spinner("Thinking about your child's lifestyle profile..."):
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_summary},
-                    ],
-                )
-
-            # schovej „načítám…“ zprávu
-            status_placeholder.empty()
-
-            recommendation_text = response.choices[0].message.content
-            st.write(recommendation_text)
-
-        except Exception as e:
-            status_placeholder.empty()
-            st.error("Sorry, there was an error while generating the recommendation.")
-            st.text(str(e))

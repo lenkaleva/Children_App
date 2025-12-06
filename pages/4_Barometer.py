@@ -243,5 +243,125 @@ if st.button("🔍 Evaluate"):
         "PHYS_ACT_60": extract_number(phys),
         "BREAKFAST_WEEKDAYS": extract_number(breakfast),
         "TOOTH_BRUSHING": extract_number(teeth),
-        "FEEL_LOW":_
+        "FEEL_LOW": extract_number(feel_low),
+        "TALK_FATHER": extract_number(talk_father)
     }
+
+    score = compute_risk_score(user_data)   # 0–100
+    risk_ratio = score / 100               # 0–1
+    arrow_pct = 2 + 96 * risk_ratio
+
+    st.write("### Behaviour Risk Meter")
+
+    bar_html = f"""
+    <div style="
+        width: 100%;
+        height: 35px;
+        background: linear-gradient(to right, 
+            #4caf50 0%,
+            #ffeb3b 50%,
+            #f44336 100%
+        );
+        border-radius: 8px;
+        position: relative;
+    ">
+        <div style="
+            position: absolute;
+            left: calc({arrow_pct}% - 10px);
+            top: -8px;
+            font-size: 26px;
+        ">⬆</div>
+    </div>
+
+    <p style="text-align:center; font-size:14px; margin-top:4px;">
+        Lifestyle risk score: <b>{score}</b> / 100
+    </p>
+    """
+
+    st.markdown(bar_html, unsafe_allow_html=True)
+
+    # ============================
+    # AI DOPORUČENÍ
+    # ============================
+    st.write("---")
+    st.subheader("📊 Recommendation")
+
+    API_KEY = st.secrets.get("OPENAI_API_KEY")
+
+    if not API_KEY:
+        st.info("AI recommendation is not available because the API key is not configured.")
+    else:
+        SYSTEM_PROMPT = """
+You are a very supportive health coach for parents, focused to prevent obesity and/or overweight, that's your primary goal. 
+You receive a short profile of a child, including sex, age, a lifestyle risk score (0-100)
+and a description of daily habits (diet, physical activity, emotional state, hygiene).
+
+Your task:
+- Pick up on answers which are most disturbing but also pick up on those most positive and give the parents a cheer up for good work.
+- Explain in simple, encouraging language what the main concerns are.
+- While giving recommendations, focus ONLY on lifestyle and habits, NOT on diagnosing obesity or giving medical treatment.
+- Give 2-3 concrete, practical tips the parents can start with in everyday life 
+  (meals, drinks, movement, routines, screen time, sleep, family habits).
+- Be very brief, max 5-7 setences. Be structured, I want the user to see the structure of your advice. Tips to be clear, maybe some bulb emoji or so.
+
+Background information from the study:
+- Boys had roughly 1.6-1.7 times higher rates of overweight than girls.
+- Younger children around 11 years had somewhat higher risk than older teenagers.
+
+Therefore:
+- Be slightly more cautious and proactive in your advice for younger boys with high risk scores.
+- For girls and older teens, still give clear advice, but avoid exaggerating the risk.
+
+Always stay kind, non-judgmental and supportive.
+Never give exact probabilities or medical diagnoses.
+Do not ask what you can do next. Give only one time recommendations, that's it.
+"""
+
+        if score < 30:
+            risk_level = "low"
+        elif score < 60:
+            risk_level = "medium"
+        else:
+            risk_level = "high"
+
+        user_summary = f"""
+Child profile:
+- Sex: {sex_label}
+- Age: {age}
+- Lifestyle risk score: {score}/100 ({risk_level} risk)
+
+Habits:
+- Soft drinks: {soft_drinks_labels[user_data['SOFT_DRINKS'] - 1]}
+- Sweets: {sweets_labels[user_data['SWEETS'] - 1]}
+- Vegetables: {vegetables_labels[user_data['VEGETABLES'] - 1]}
+- Physical activity (60+ min): {phys_labels[user_data['PHYS_ACT_60'] - 1]}
+- Breakfast on schooldays: {breakfast_labels[user_data['BREAKFAST_WEEKDAYS'] - 1]}
+- Tooth brushing: {tooth_labels[user_data['TOOTH_BRUSHING'] - 1]}
+- Feeling low: {feellow_labels[user_data['FEEL_LOW'] - 1]}
+- Talking to father: {talkfather_labels[user_data['TALK_FATHER'] - 1]}
+"""
+
+        client = OpenAI(api_key=API_KEY)
+
+        status_placeholder = st.empty()
+        status_placeholder.markdown("⏳ *Generating tips for your child…*")
+
+        try:
+            with st.spinner("Thinking about your child's lifestyle profile..."):
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_summary},
+                    ],
+                )
+
+            status_placeholder.empty()
+
+            recommendation_text = response.choices[0].message.content
+            st.write(recommendation_text)
+
+        except Exception as e:
+            status_placeholder.empty()
+            st.error("Sorry, there was an error while generating the recommendation.")
+            st.text(str(e))
